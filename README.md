@@ -1,5 +1,5 @@
 
-# Swigg
+# Swig
 
 A simple Flask app for serving static websites.
 
