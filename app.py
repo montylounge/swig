@@ -1,11 +1,24 @@
-import os
-from flask import Flask, send_from_directory, redirect
+import os, sys
+from urlparse import urlparse, urlunparse
+from flask import Flask, send_from_directory, request, redirect
+from jinja2.exceptions import TemplateNotFound
 
 PROJECT_ROOT = os.path.dirname(__file__)
 WWW_ROOT = os.path.join(PROJECT_ROOT, 'www')
 STATIC_ROOT = os.path.join(WWW_ROOT, 'static')
+WWW_URL = "www.YOURWEBSITE.com"
 
-app = Flask(__name__, static_folder=STATIC_ROOT)
+app = Flask(__name__, static_folder=STATIC_ROOT, template_folder=WWW_ROOT)
+
+@app.before_request
+def redirect_nonwww():
+    """Redirect non-www requests to www."""
+    urlparts = urlparse(request.url)
+    if urlparts.netloc == WWW_URL.replace("www.",""):
+        urlparts_list = list(urlparts)
+        urlparts_list[1] = WWW_URL
+        return redirect(urlunparse(urlparts_list), code=301)
+
 
 @app.route('/favicon.ico')
 def favicon():
